@@ -16,7 +16,7 @@ app.get("/", (req, res) => {
 app.get("/user", async (req, res) => {
   try {
     const user = await User.find({});
-    res.status(200).json({ message: user });
+    res.status(200).json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -25,7 +25,7 @@ app.get("/user", async (req, res) => {
 app.post("/user", async (req, res) => {
   try {
     const user = await User.create(req.body);
-    res.status(200).json({ message: user });
+    res.status(200).json("user created successfully");
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -35,30 +35,40 @@ app.get("/user/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const user = await User.findById(id);
-    res.status(200).json({ message: user });
+    if (!user) {
+      res.status(404).json({ message: "user doesn't exist" });
+    }
+    res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "invalid id format" });
   }
 });
 
 app.put("/user/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const user = await User.findByIdAndUpdate(id, req.body);
-    const updatedUser = await User.findById(id);
+    const user = await User.findById(id);
+    if (!user) {
+      res.status(404).json({ message: "user doesn't exist" });
+    }
+    const updatedUser = User.findByIdAndUpdate(id, req.body);
     res.status(200).json({ message: updatedUser });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "invalid id format" });
   }
 });
 
 app.delete("/user/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const user = await User.findByIdAndDelete(id);
+    const user = await User.findById(id);
+    if (!user) {
+      res.status(404).json({ message: "user doesn't exist" });
+    }
+    await User.findByIdAndDelete(id);
     res.status(200).json({ message: "user successfully deleted" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "invalid id format" });
   }
 });
 
